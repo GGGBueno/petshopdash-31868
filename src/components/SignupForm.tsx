@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { PawPrint, Mail, Lock, Eye, EyeOff, User } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 
 const signupSchema = z.object({
   email: z.string().email({ message: "Email inválido" }),
@@ -13,6 +13,7 @@ const signupSchema = z.object({
 });
 
 const SignupForm = ({ onSuccess }: { onSuccess: () => void }) => {
+  const { signUp } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -79,21 +80,13 @@ const SignupForm = ({ onSuccess }: { onSuccess: () => void }) => {
     setIsLoading(true);
     
     try {
-      const { error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            name: formData.name
-          }
-        }
-      });
+      const { error } = await signUp(formData.email, formData.password, formData.name);
       
       if (error) {
         console.error('Signup error:', error);
         toast.error(error.message || 'Erro ao criar conta. Tente novamente.');
       } else {
-        toast.success('Conta criada com sucesso!');
+        toast.success('Conta criada com sucesso! Faça login para continuar.');
         onSuccess();
       }
     } catch (error) {

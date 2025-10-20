@@ -6,6 +6,7 @@ import { PawPrint, Mail, Lock, Eye, EyeOff, Heart, Sparkles } from 'lucide-react
 import { z } from 'zod';
 import { useAuth } from '@/context/AuthContext';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import SignupForm from '@/components/SignupForm';
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Email inválido" }),
@@ -17,6 +18,7 @@ const Index = () => {
   const { signIn, user, isLoading: authLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isSignupMode, setIsSignupMode] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -145,83 +147,121 @@ const Index = () => {
         className={`m-auto z-20 px-6 py-8 transition-all duration-700 transform ${isPageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
       >
         <div className="w-full max-w-md mx-auto">
-          <form 
-            onSubmit={handleSubmit} 
+          <div 
             className="glass-card dark:bg-gray-800/40 rounded-2xl p-8 space-y-6 animate-fade-in"
             style={{ backdropFilter: "blur(16px)" }}
           >
-            <h1 className="text-2xl font-bold text-white text-center mb-2 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-              Bem-vindo ao Pet Paradise!
-            </h1>
-            <p className="text-white/80 text-center mb-6 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-              Entre para gerenciar seu petshop
-            </p>
+            {isSignupMode ? (
+              <>
+                <SignupForm onSuccess={() => {
+                  setIsSignupMode(false);
+                  toast.success('Agora faça login com suas credenciais!');
+                }} />
+                
+                <div className="text-center animate-slide-up" style={{ animationDelay: '0.7s' }}>
+                  <p className="text-white/80 text-sm">
+                    Já tem uma conta?{' '}
+                    <button
+                      type="button"
+                      onClick={() => setIsSignupMode(false)}
+                      className="text-petshop-gold hover:text-white transition-colors duration-300 font-semibold"
+                    >
+                      Faça login
+                    </button>
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <h1 className="text-2xl font-bold text-white text-center mb-2 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+                    Bem-vindo ao Pet Paradise!
+                  </h1>
+                  <p className="text-white/80 text-center mb-6 animate-slide-up" style={{ animationDelay: '0.3s' }}>
+                    Entre para gerenciar seu petshop
+                  </p>
 
-            <div className="space-y-4 animate-slide-up" style={{ animationDelay: '0.4s' }}>
-              <div className="relative group">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 h-5 w-5 group-hover:text-petshop-gold transition-colors duration-300" />
-                <Input
-                  type="email"
-                  name="email"
-                  placeholder="Email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className={`pl-10 h-12 bg-white/10 dark:bg-gray-700/50 border-white/20 text-white rounded-md transition-all duration-300 hover:border-petshop-gold/50 ${errors.email ? 'border-red-400' : 'focus:border-petshop-gold'}`}
-                />
-                {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
-              </div>
+                  <div className="space-y-4 animate-slide-up" style={{ animationDelay: '0.4s' }}>
+                    <div className="relative group">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 h-5 w-5 group-hover:text-petshop-gold transition-colors duration-300" />
+                      <Input
+                        type="email"
+                        name="email"
+                        placeholder="Email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className={`pl-10 h-12 bg-white/10 dark:bg-gray-700/50 border-white/20 text-white rounded-md transition-all duration-300 hover:border-petshop-gold/50 ${errors.email ? 'border-red-400' : 'focus:border-petshop-gold'}`}
+                      />
+                      {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
+                    </div>
 
-              <div className="relative group">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 h-5 w-5 group-hover:text-petshop-gold transition-colors duration-300" />
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  placeholder="Senha"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className={`pl-10 h-12 bg-white/10 dark:bg-gray-700/50 border-white/20 text-white rounded-md transition-all duration-300 hover:border-petshop-gold/50 ${errors.password ? 'border-red-400' : 'focus:border-petshop-gold'}`}
-                />
-                <button 
-                  type="button"
-                  onClick={togglePasswordVisibility}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/60 h-5 w-5 hover:text-petshop-gold transition-colors duration-300"
-                >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-                {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
-              </div>
-            </div>
+                    <div className="relative group">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 h-5 w-5 group-hover:text-petshop-gold transition-colors duration-300" />
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        placeholder="Senha"
+                        value={formData.password}
+                        onChange={handleChange}
+                        className={`pl-10 h-12 bg-white/10 dark:bg-gray-700/50 border-white/20 text-white rounded-md transition-all duration-300 hover:border-petshop-gold/50 ${errors.password ? 'border-red-400' : 'focus:border-petshop-gold'}`}
+                      />
+                      <button 
+                        type="button"
+                        onClick={togglePasswordVisibility}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/60 h-5 w-5 hover:text-petshop-gold transition-colors duration-300"
+                      >
+                        {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      </button>
+                      {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
+                    </div>
+                  </div>
 
-            <div className="flex items-center justify-between animate-slide-up" style={{ animationDelay: '0.5s' }}>
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="remember"
-                  className="w-4 h-4 bg-white/10 dark:bg-gray-700/50 border-white/20 rounded focus:ring-petshop-gold text-petshop-gold"
-                />
-                <label htmlFor="remember" className="ml-2 text-sm text-white/80 hover:text-white transition-colors duration-300">
-                  Lembrar-me
-                </label>
-              </div>
-              <a href="#" className="text-sm text-petshop-gold hover:text-white transition-colors duration-300">
-                Esqueceu a senha?
-              </a>
-            </div>
+                  <div className="flex items-center justify-between animate-slide-up" style={{ animationDelay: '0.5s' }}>
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="remember"
+                        className="w-4 h-4 bg-white/10 dark:bg-gray-700/50 border-white/20 rounded focus:ring-petshop-gold text-petshop-gold"
+                      />
+                      <label htmlFor="remember" className="ml-2 text-sm text-white/80 hover:text-white transition-colors duration-300">
+                        Lembrar-me
+                      </label>
+                    </div>
+                    <a href="#" className="text-sm text-petshop-gold hover:text-white transition-colors duration-300">
+                      Esqueceu a senha?
+                    </a>
+                  </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full button-hover-effect bg-petshop-gold hover:bg-amber-500 text-petshop-blue dark:text-gray-900 font-bold py-3 px-4 rounded-md flex items-center justify-center transition-all duration-300 animate-slide-up"
-              style={{ animationDelay: '0.6s' }}
-            >
-              {isLoading ? (
-                <div className="h-5 w-5 border-2 border-petshop-blue dark:border-gray-900 border-t-transparent rounded-full animate-spin mr-2"></div>
-              ) : (
-                <PawPrint className="mr-2 h-5 w-5" />
-              )}
-              {isLoading ? "Entrando..." : "Login"}
-            </button>
-          </form>
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full button-hover-effect bg-petshop-gold hover:bg-amber-500 text-petshop-blue dark:text-gray-900 font-bold py-3 px-4 rounded-md flex items-center justify-center transition-all duration-300 animate-slide-up"
+                    style={{ animationDelay: '0.6s' }}
+                  >
+                    {isLoading ? (
+                      <div className="h-5 w-5 border-2 border-petshop-blue dark:border-gray-900 border-t-transparent rounded-full animate-spin mr-2"></div>
+                    ) : (
+                      <PawPrint className="mr-2 h-5 w-5" />
+                    )}
+                    {isLoading ? "Entrando..." : "Login"}
+                  </button>
+                </form>
+
+                <div className="text-center animate-slide-up" style={{ animationDelay: '0.7s' }}>
+                  <p className="text-white/80 text-sm">
+                    Não tem uma conta?{' '}
+                    <button
+                      type="button"
+                      onClick={() => setIsSignupMode(true)}
+                      className="text-petshop-gold hover:text-white transition-colors duration-300 font-semibold"
+                    >
+                      Cadastre-se
+                    </button>
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
